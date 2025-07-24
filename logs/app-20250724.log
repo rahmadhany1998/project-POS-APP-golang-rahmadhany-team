@@ -1,0 +1,3 @@
+{"L":"FATAL","timestamp":"2025-07-24T18:47:00.028+0800","C":"project-POS-APP-golang-be-team/main.go:33","M":"can't connect to database ","error":"sql: unknown driver \"postgres\" (forgotten import?)"}
+{"L":"FATAL","timestamp":"2025-07-24T18:49:47.491+0800","C":"project-POS-APP-golang-be-team/main.go:38","M":"failed to run migrations","error":"pq: got 2 parameters but the statement requires 1"}
+{"L":"FATAL","timestamp":"2025-07-24T18:51:10.542+0800","C":"project-POS-APP-golang-be-team/main.go:38","M":"failed to run migrations","error":"pq: got 2 parameters but the statement requires 1"}
