@@ -33,4 +33,5 @@ func wireAuth(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, 
 	router.POST("/auth/forgot-password", adaptorAuth.ForgotPassword)
 	router.POST("/auth/verify-otp", adaptorAuth.VerifyOtp)
 	router.POST("/auth/reset-password", adaptorAuth.ResetPassword)
+	router.POST("/auth/logout", middlwareAuth.Auth(), adaptorAuth.Logout)
 }

@@ -79,5 +79,21 @@ func (h *HandlerAuth) ResetPassword(ctx *gin.Context) {
 		response.ResponseBadRequest(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	response.ResponseSuccess(ctx, http.StatusOK, "password berhasil direset", nil)
+	response.ResponseSuccess(ctx, http.StatusOK, "reset password success", nil)
+}
+
+func (h *HandlerAuth) Logout(ctx *gin.Context) {
+	token := ctx.GetHeader("Authorization")
+	if token == "" {
+		response.ResponseBadRequest(ctx, http.StatusUnauthorized, "empty token")
+		return
+	}
+
+	err := h.AuthService.Logout(ctx.Request.Context(), token)
+	if err != nil {
+		response.ResponseBadRequest(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.ResponseSuccess(ctx, http.StatusOK, "logout successfull", nil)
 }

@@ -20,6 +20,7 @@ type AuthService interface {
 	ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) error
 	VerifyOtp(ctx context.Context, req dto.VerifyOtpRequest) error
 	ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) error
+	Logout(ctx context.Context, token string) error
 }
 
 type authService struct {
@@ -108,6 +109,13 @@ func (s *authService) ResetPassword(ctx context.Context, req dto.ResetPasswordRe
 	}
 	if err := s.Repo.AuthRepo.MarkOtpAsUsed(ctx, token.ID); err != nil {
 		s.Logger.Warn("failed to mark otp as used", zap.Error(err))
+	}
+	return nil
+}
+
+func (s *authService) Logout(ctx context.Context, token string) error {
+	if err := s.Repo.AuthRepo.DeleteLoginToken(ctx, token); err != nil {
+		return errors.New("logout failed")
 	}
 	return nil
 }

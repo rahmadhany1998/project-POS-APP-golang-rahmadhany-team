@@ -1,1 +1,10 @@
 {"L":"INFO","timestamp":"2025-07-25T18:00:04.293+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/login","duration":"234.1956ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:40:01.149+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/login","duration":"1.1991ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:40:58.222+0800","C":"usecase/auth.go:87","M":"OTP for reset password","email":"budi@example.com","otp":"0705"}
+{"L":"INFO","timestamp":"2025-07-25T19:40:58.230+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/forgot-password","duration":"29.4999ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:43:31.229+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/verify-otp","duration":"8.2626ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:45:32.267+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/reset-password","duration":"193.1231ms"}
+{"L":"ERROR","timestamp":"2025-07-25T19:46:14.604+0800","C":"usecase/auth.go:48","M":"login failed: wrong password","email":"budi@example.com"}
+{"L":"INFO","timestamp":"2025-07-25T19:46:14.604+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/login","duration":"156.1067ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:46:37.598+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/login","duration":"156.424ms"}
+{"L":"INFO","timestamp":"2025-07-25T19:58:30.874+0800","C":"middleware/logger.go:26","M":"HTTP Request","method":"POST","path":"/api/v1/auth/logout","duration":"11.5884ms"}

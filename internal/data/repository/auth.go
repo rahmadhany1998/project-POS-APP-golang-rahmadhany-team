@@ -16,6 +16,7 @@ type AuthRepository interface {
 	FindValidOtpToken(ctx context.Context, email string, otp string) (*entity.PasswordResetToken, error)
 	UpdateUserPassword(ctx context.Context, email string, newHashed string) error
 	MarkOtpAsUsed(ctx context.Context, id int) error
+	DeleteLoginToken(ctx context.Context, token string) error
 }
 
 type authRepositoryImpl struct {
@@ -100,6 +101,14 @@ func (r *authRepositoryImpl) MarkOtpAsUsed(ctx context.Context, id int) error {
 		Where("id = ?", id).
 		Update("is_used", true).Error; err != nil {
 		r.Log.Error("MarkOtpAsUsed failed: " + err.Error())
+		return err
+	}
+	return nil
+}
+
+func (r *authRepositoryImpl) DeleteLoginToken(ctx context.Context, token string) error {
+	if err := r.DB.WithContext(ctx).Where("token = ?", token).Delete(&entity.LoginToken{}).Error; err != nil {
+		r.Log.Error("DeleteLoginToken failed: " + err.Error())
 		return err
 	}
 	return nil
