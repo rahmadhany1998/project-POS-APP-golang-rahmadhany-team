@@ -39,3 +39,45 @@ func (h *HandlerAuth) Login(ctx *gin.Context) {
 
 	response.ResponseSuccess(ctx, http.StatusOK, "login successfull", resp)
 }
+
+func (h *HandlerAuth) ForgotPassword(ctx *gin.Context) {
+	var req dto.ForgotPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		detail := utils.ValidateDataGin(err)
+		response.ResponseBadRequest2(ctx, http.StatusBadRequest, detail)
+		return
+	}
+	if err := h.AuthService.ForgotPassword(ctx.Request.Context(), req); err != nil {
+		response.ResponseBadRequest(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, "otp sent!", nil)
+}
+
+func (h *HandlerAuth) VerifyOtp(ctx *gin.Context) {
+	var req dto.VerifyOtpRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		detail := utils.ValidateDataGin(err)
+		response.ResponseBadRequest2(ctx, http.StatusBadRequest, detail)
+		return
+	}
+	if err := h.AuthService.VerifyOtp(ctx.Request.Context(), req); err != nil {
+		response.ResponseBadRequest(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, "otp valid", nil)
+}
+
+func (h *HandlerAuth) ResetPassword(ctx *gin.Context) {
+	var req dto.ResetPasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		detail := utils.ValidateDataGin(err)
+		response.ResponseBadRequest2(ctx, http.StatusBadRequest, detail)
+		return
+	}
+	if err := h.AuthService.ResetPassword(ctx.Request.Context(), req); err != nil {
+		response.ResponseBadRequest(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, "password berhasil direset", nil)
+}

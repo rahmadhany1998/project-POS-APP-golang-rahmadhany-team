@@ -3,10 +3,13 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
 	"project-POS-APP-golang-be-team/internal/data/entity"
 	"project-POS-APP-golang-be-team/internal/data/repository"
 	"project-POS-APP-golang-be-team/internal/dto"
 	"project-POS-APP-golang-be-team/pkg/utils"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -14,6 +17,9 @@ import (
 
 type AuthService interface {
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.ResponseUser, error)
+	ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) error
+	VerifyOtp(ctx context.Context, req dto.VerifyOtpRequest) error
+	ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) error
 }
 
 type authService struct {
@@ -60,4 +66,48 @@ func (s *authService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Res
 		Token: token,
 	}
 	return resp, nil
+}
+
+func (s *authService) ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) error {
+	user, err := s.Repo.AuthRepo.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return errors.New("email not registered")
+	}
+
+	otp := fmt.Sprintf("%04d", rand.Intn(10000))
+	token := &entity.PasswordResetToken{
+		UserID:    uint(user.ID),
+		OtpCode:   otp,
+		ExpiresAt: time.Now().Add(5 * time.Minute),
+	}
+	if err := s.Repo.AuthRepo.CreatePasswordResetToken(ctx, token); err != nil {
+		return errors.New("failed to save otp")
+	}
+
+	s.Logger.Info("OTP for reset password", zap.String("email", req.Email), zap.String("otp", otp))
+	return nil
+}
+
+func (s *authService) VerifyOtp(ctx context.Context, req dto.VerifyOtpRequest) error {
+	_, err := s.Repo.AuthRepo.FindValidOtpToken(ctx, req.Email, req.Otp)
+	if err != nil {
+		return errors.New("otp bot valid or expired")
+	}
+	return nil
+}
+
+func (s *authService) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) error {
+	token, err := s.Repo.AuthRepo.FindValidOtpToken(ctx, req.Email, req.Otp)
+	if err != nil {
+		return errors.New("otp not valid")
+	}
+
+	hashed := utils.HashPassword(req.NewPassword)
+	if err := s.Repo.AuthRepo.UpdateUserPassword(ctx, req.Email, string(hashed)); err != nil {
+		return errors.New("failed to change password")
+	}
+	if err := s.Repo.AuthRepo.MarkOtpAsUsed(ctx, token.ID); err != nil {
+		s.Logger.Warn("failed to mark otp as used", zap.Error(err))
+	}
+	return nil
 }

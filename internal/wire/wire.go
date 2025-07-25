@@ -29,5 +29,8 @@ func wireUser(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, 
 func wireAuth(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
 	usecaseAuth := usecase.NewAuthService(repo, logger, config)
 	adaptorAuth := adaptor.NewHandlerAuth(usecaseAuth, logger)
-	router.POST("/login", adaptorAuth.Login)
+	router.POST("/auth/login", adaptorAuth.Login)
+	router.POST("/auth/forgot-password", adaptorAuth.ForgotPassword)
+	router.POST("/auth/verify-otp", adaptorAuth.VerifyOtp)
+	router.POST("/auth/reset-password", adaptorAuth.ResetPassword)
 }
