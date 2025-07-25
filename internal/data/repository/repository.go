@@ -6,8 +6,11 @@ import (
 )
 
 type Repository struct {
+	AuthRepo AuthRepository
 }
 
 func NewRepository(db *gorm.DB, log *zap.Logger) Repository {
-	return Repository{}
+	return Repository{
+		AuthRepo: NewAuthRepository(db, log),
+	}
 }

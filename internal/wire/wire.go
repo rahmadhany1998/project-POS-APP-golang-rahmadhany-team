@@ -16,6 +16,7 @@ func Wiring(repo repository.Repository, mLogger middleware.LoggerMiddleware, mid
 	router.Use(mLogger.LoggingMiddleware())
 	api := router.Group("/api/v1")
 	wireUser(api, middlwareAuth, repo, logger, config)
+	wireAuth(api, middlwareAuth, repo, logger, config)
 	return router
 }
 
@@ -23,4 +24,10 @@ func wireUser(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, 
 	usecaseUser := usecase.NewUserService(repo, logger, config)
 	adaptorUser := adaptor.NewHandlerUser(usecaseUser, logger)
 	router.GET("/test-handler", adaptorUser.TestHandler)
+}
+
+func wireAuth(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
+	usecaseAuth := usecase.NewAuthService(repo, logger, config)
+	adaptorAuth := adaptor.NewHandlerAuth(usecaseAuth, logger)
+	router.POST("/login", adaptorAuth.Login)
 }

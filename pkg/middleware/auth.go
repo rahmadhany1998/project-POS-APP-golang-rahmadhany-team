@@ -1,22 +1,20 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
-	"project-POS-APP-golang-be-team/internal/data/entity"
+	"project-POS-APP-golang-be-team/internal/data/repository"
 	"project-POS-APP-golang-be-team/pkg/response"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 type AuthMiddleware struct {
-	Repo   *gorm.DB
+	Repo   repository.Repository
 	Logger *zap.Logger
 }
 
-func NewAuthMiddleware(repo *gorm.DB, logger *zap.Logger) AuthMiddleware {
+func NewAuthMiddleware(repo repository.Repository, logger *zap.Logger) AuthMiddleware {
 	return AuthMiddleware{
 		Repo:   repo,
 		Logger: logger,
@@ -32,17 +30,18 @@ func (m *AuthMiddleware) Auth() gin.HandlerFunc {
 			return
 		}
 
-		var user entity.User
-		err := m.Repo.Where("token = ?", token).First(&user).Error
+		// Ambil user berdasarkan token login
+		loginToken, err := m.Repo.AuthRepo.FindUserByToken(ctx.Request.Context(), token)
 		if err != nil {
+			m.Logger.Error("token invalid", zap.String("token", token), zap.String("error", err.Error()))
 			response.ResponseBadRequest(ctx, http.StatusUnauthorized, "invalid token")
 			ctx.Abort()
 			return
 		}
 
-		ctx.Set("userID", user.ID)
-		ctx.Set("userRole", user.Role)
-		fmt.Println("✅ Middleware: user found, ID =", user.ID, "Role =", user.Role)
+		// Set ke context
+		ctx.Set("userID", loginToken.User.ID)
+		ctx.Set("userRole", loginToken.User.Role)
 
 		ctx.Next()
 	}

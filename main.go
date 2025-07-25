@@ -45,7 +45,7 @@ func main() {
 
 	repo := repository.NewRepository(db, logger)
 	mLogger := middleware.NewLoggerMiddleware(logger)
-	mAuth := middleware.NewAuthMiddleware(db, logger)
+	mAuth := middleware.NewAuthMiddleware(repo, logger)
 	router := wire.Wiring(repo, mLogger, mAuth, logger, config)
 
 	cmd.ApiServer(config, logger, router)
