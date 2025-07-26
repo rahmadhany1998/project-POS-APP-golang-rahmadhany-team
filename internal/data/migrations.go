@@ -11,5 +11,11 @@ func AutoMigrate(db *gorm.DB) error {
 		&entity.User{},
 		&entity.PasswordResetToken{},
 		&entity.LoginToken{},
+		&entity.Category{},
+		&entity.Table{},
+		&entity.UserAccess{},
+		&entity.Product{},
+		&entity.Order{},
+		&entity.OrderItem{},
 	)
 }
