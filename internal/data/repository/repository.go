@@ -6,11 +6,13 @@ import (
 )
 
 type Repository struct {
-	AuthRepo AuthRepository
+	AuthRepo    AuthRepository
+	RevenueRepo RevenueRepository
 }
 
 func NewRepository(db *gorm.DB, log *zap.Logger) Repository {
 	return Repository{
-		AuthRepo: NewAuthRepository(db, log),
+		AuthRepo:    NewAuthRepository(db, log),
+		RevenueRepo: NewRevenueRepository(db, log),
 	}
 }

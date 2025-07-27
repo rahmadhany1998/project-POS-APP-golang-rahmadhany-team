@@ -12,6 +12,7 @@ type Configuration struct {
 	Limit      int
 	PathLogger string
 	PathUpload string
+	Margin     float64
 }
 
 type DatabaseConfig struct {
@@ -44,6 +45,7 @@ func ReadConfiguration() (Configuration, error) {
 		Limit:      viper.GetInt("LIMIT"),
 		PathLogger: viper.GetString("PATH_LOGGER"),
 		PathUpload: viper.GetString("PATH_UPLOAD"),
+		Margin:     viper.GetFloat64("MARGIN"),
 		DB: DatabaseConfig{
 			Name:         viper.GetString("DATABASE_NAME"),
 			Username:     viper.GetString("DATABASE_USER"),

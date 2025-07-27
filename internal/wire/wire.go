@@ -17,6 +17,7 @@ func Wiring(repo repository.Repository, mLogger middleware.LoggerMiddleware, mid
 	api := router.Group("/api/v1")
 	wireUser(api, middlwareAuth, repo, logger, config)
 	wireAuth(api, middlwareAuth, repo, logger, config)
+	wireRevenue(api, middlwareAuth, repo, logger, config)
 	return router
 }
 
@@ -34,4 +35,10 @@ func wireAuth(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, 
 	router.POST("/auth/verify-otp", adaptorAuth.VerifyOtp)
 	router.POST("/auth/reset-password", adaptorAuth.ResetPassword)
 	router.POST("/auth/logout", middlwareAuth.Auth(), adaptorAuth.Logout)
+}
+
+func wireRevenue(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
+	usecaseRevenue := usecase.NewRevenueService(repo, logger, config)
+	adaptorRevenue := adaptor.NewHandlerRevenue(usecaseRevenue, logger)
+	router.GET("/revenue", middlwareAuth.Auth(), adaptorRevenue.GetRevenueReport)
 }

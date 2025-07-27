@@ -18,3 +18,24 @@ type ResponValidatePhone struct {
 	Phone  string `json:"phone"`
 	Vendor string `json:"vendor"`
 }
+
+type RevenueReport struct {
+	Total           float64          `json:"total"`
+	StatusBreakdown map[string]int   `json:"status_breakdown"`
+	MonthlyRevenue  []MonthlyRevenue `json:"monthly_revenue"`
+	TopProducts     []TopProduct     `json:"top_products"`
+}
+
+type MonthlyRevenue struct {
+	Month string  `json:"month"`
+	Total float64 `json:"total"`
+}
+
+type TopProduct struct {
+	Name         string  `json:"name"`
+	SellPrice    float64 `json:"sell_price"`
+	Profit       float64 `json:"profit"`
+	Margin       float64 `json:"margin"`
+	TotalRevenue float64 `json:"total_revenue"`
+	RevenueDate  string  `json:"revenue_date"`
+}
