@@ -1,6 +1,7 @@
 package entity
 
 type OrderItem struct {
+	Model
 	OrderID   uint    `json:"order_id"`
 	ProductID uint    `json:"product_id"`
 	Quantity  int     `json:"quantity"`
