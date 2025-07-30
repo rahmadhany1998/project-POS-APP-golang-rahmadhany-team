@@ -20,10 +20,8 @@ type ResponValidatePhone struct {
 }
 
 type RevenueReport struct {
-	Total           float64          `json:"total"`
-	StatusBreakdown map[string]int   `json:"status_breakdown"`
-	MonthlyRevenue  []MonthlyRevenue `json:"monthly_revenue"`
-	TopProducts     []TopProduct     `json:"top_products"`
+	Total           float64        `json:"total"`
+	StatusBreakdown map[string]int `json:"status_breakdown"`
 }
 
 type MonthlyRevenue struct {

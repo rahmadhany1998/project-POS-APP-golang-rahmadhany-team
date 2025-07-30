@@ -40,5 +40,7 @@ func wireAuth(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, 
 func wireRevenue(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
 	usecaseRevenue := usecase.NewRevenueService(repo, logger, config)
 	adaptorRevenue := adaptor.NewHandlerRevenue(usecaseRevenue, logger)
-	router.GET("/revenue", middlwareAuth.Auth(), adaptorRevenue.GetRevenueReport)
+	router.GET("/report/revenue", middlwareAuth.Auth(), adaptorRevenue.GetRevenueSummary)
+	router.GET("/report/monthly-revenue", middlwareAuth.Auth(), adaptorRevenue.GetMonthlyRevenue)
+	router.GET("/report/top-products", middlwareAuth.Auth(), adaptorRevenue.GetTopProducts)
 }

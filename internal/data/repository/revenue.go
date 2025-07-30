@@ -10,7 +10,9 @@ import (
 )
 
 type RevenueRepository interface {
-	GetRevenueReport(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error)
+	GetRevenueSummary(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error)
+	GetMonthlyRevenue(ctx context.Context, startDate, endDate string) ([]dto.MonthlyRevenue, error)
+	GetTopProducts(ctx context.Context, startDate, endDate string) ([]dto.TopProduct, error)
 }
 
 type revenueRepositoryImpl struct {
@@ -25,7 +27,7 @@ func NewRevenueRepository(db *gorm.DB, log *zap.Logger) RevenueRepository {
 	}
 }
 
-func (r *revenueRepositoryImpl) GetRevenueReport(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error) {
+func (r *revenueRepositoryImpl) GetRevenueSummary(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error) {
 	var report dto.RevenueReport
 
 	// Total revenue
@@ -59,21 +61,28 @@ func (r *revenueRepositoryImpl) GetRevenueReport(ctx context.Context, startDate,
 		report.StatusBreakdown[s.Status] = s.Count
 	}
 
-	// Monthly revenue
-	err = r.DB.WithContext(ctx).
+	return &report, nil
+}
+
+func (r *revenueRepositoryImpl) GetMonthlyRevenue(ctx context.Context, startDate, endDate string) ([]dto.MonthlyRevenue, error) {
+	var monthly []dto.MonthlyRevenue
+	err := r.DB.WithContext(ctx).
 		Raw(`
 			SELECT TO_CHAR(created_at, 'YYYY-MM') AS month, SUM(total) AS total
 			FROM orders
 			WHERE created_at BETWEEN ? AND ?
 			GROUP BY month
 			ORDER BY month ASC
-		`, startDate, endDate).Scan(&report.MonthlyRevenue).Error
+		`, startDate, endDate).
+		Scan(&monthly).Error
 	if err != nil {
 		r.Log.Error("failed to get monthly revenue", zap.String("error", err.Error()))
 		return nil, err
 	}
+	return monthly, nil
+}
 
-	// Top products
+func (r *revenueRepositoryImpl) GetTopProducts(ctx context.Context, startDate, endDate string) ([]dto.TopProduct, error) {
 	topProducts := []struct {
 		Name         string  `json:"name"`
 		SellPrice    float64 `json:"sell_price"`
@@ -81,7 +90,7 @@ func (r *revenueRepositoryImpl) GetRevenueReport(ctx context.Context, startDate,
 		RevenueDate  string  `json:"revenue_date"`
 	}{}
 
-	err = r.DB.WithContext(ctx).
+	err := r.DB.WithContext(ctx).
 		Raw(`
 			SELECT p.name, p.price AS sell_price,
 				sum(oi.price * oi.quantity) as total_revenue,
@@ -93,20 +102,21 @@ func (r *revenueRepositoryImpl) GetRevenueReport(ctx context.Context, startDate,
 			GROUP BY p.name, p.price, revenue_date
 			ORDER BY total_revenue DESC
 			LIMIT 10
-		`, startDate, endDate).Scan(&topProducts).Error
+		`, startDate, endDate).
+		Scan(&topProducts).Error
 	if err != nil {
 		r.Log.Error("failed to get top products", zap.String("error", err.Error()))
 		return nil, err
 	}
 
+	var result []dto.TopProduct
 	for _, p := range topProducts {
-		report.TopProducts = append(report.TopProducts, dto.TopProduct{
+		result = append(result, dto.TopProduct{
 			Name:         p.Name,
 			SellPrice:    p.SellPrice,
 			TotalRevenue: p.TotalRevenue,
 			RevenueDate:  p.RevenueDate,
 		})
 	}
-
-	return &report, nil
+	return result, nil
 }
