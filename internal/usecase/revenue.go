@@ -10,7 +10,9 @@ import (
 )
 
 type RevenueService interface {
-	GetRevenueReport(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error)
+	GetRevenueSummary(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error)
+	GetMonthlyRevenue(ctx context.Context, startDate, endDate string) ([]dto.MonthlyRevenue, error)
+	GetTopProducts(ctx context.Context, startDate, endDate string) ([]dto.TopProduct, error)
 }
 
 type revenueService struct {
@@ -27,19 +29,31 @@ func NewRevenueService(repo repository.Repository, logger *zap.Logger, config ut
 	}
 }
 
-func (s *revenueService) GetRevenueReport(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error) {
-	report, err := s.Repo.RevenueRepo.GetRevenueReport(ctx, startDate, endDate)
+func (s *revenueService) GetRevenueSummary(ctx context.Context, startDate, endDate string) (*dto.RevenueReport, error) {
+	report, err := s.Repo.RevenueRepo.GetRevenueSummary(ctx, startDate, endDate)
 	if err != nil {
-		s.Logger.Error("failed to get revenue report", zap.String("error", err.Error()))
+		s.Logger.Error("failed to get revenue summary", zap.String("error", err.Error()))
+		return nil, err
+	}
+	return report, nil
+}
+
+func (s *revenueService) GetMonthlyRevenue(ctx context.Context, startDate, endDate string) ([]dto.MonthlyRevenue, error) {
+	return s.Repo.RevenueRepo.GetMonthlyRevenue(ctx, startDate, endDate)
+}
+
+func (s *revenueService) GetTopProducts(ctx context.Context, startDate, endDate string) ([]dto.TopProduct, error) {
+	products, err := s.Repo.RevenueRepo.GetTopProducts(ctx, startDate, endDate)
+	if err != nil {
+		s.Logger.Error("failed to get top products", zap.String("error", err.Error()))
 		return nil, err
 	}
 
-	// Inject profit and margin (15%) manually
-	for i := range report.TopProducts {
-		revenue := report.TopProducts[i].TotalRevenue
-		report.TopProducts[i].Margin = s.Config.Margin
-		report.TopProducts[i].Profit = report.TopProducts[i].SellPrice * report.TopProducts[i].Margin * (revenue / report.TopProducts[i].SellPrice)
+	for i := range products {
+		revenue := products[i].TotalRevenue
+		products[i].Margin = s.Config.Margin
+		products[i].Profit = products[i].SellPrice * products[i].Margin * (revenue / products[i].SellPrice)
 	}
 
-	return report, nil
+	return products, nil
 }

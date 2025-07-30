@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type Pagination struct {
 	CurrentPage  int `json:"current_page"`
 	Limit        int `json:"limit"`
@@ -20,10 +22,8 @@ type ResponValidatePhone struct {
 }
 
 type RevenueReport struct {
-	Total           float64          `json:"total"`
-	StatusBreakdown map[string]int   `json:"status_breakdown"`
-	MonthlyRevenue  []MonthlyRevenue `json:"monthly_revenue"`
-	TopProducts     []TopProduct     `json:"top_products"`
+	Total           float64        `json:"total"`
+	StatusBreakdown map[string]int `json:"status_breakdown"`
 }
 
 type MonthlyRevenue struct {
@@ -32,10 +32,10 @@ type MonthlyRevenue struct {
 }
 
 type TopProduct struct {
-	Name         string  `json:"name"`
-	SellPrice    float64 `json:"sell_price"`
-	Profit       float64 `json:"profit"`
-	Margin       float64 `json:"margin"`
-	TotalRevenue float64 `json:"total_revenue"`
-	RevenueDate  string  `json:"revenue_date"`
+	Name         string    `json:"name"`
+	SellPrice    float64   `json:"sell_price"`
+	Profit       float64   `json:"profit"`
+	Margin       float64   `json:"margin"`
+	TotalRevenue float64   `json:"total_revenue"`
+	RevenueDate  time.Time `json:"revenue_date"`
 }
