@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type Pagination struct {
 	CurrentPage  int `json:"current_page"`
 	Limit        int `json:"limit"`
@@ -30,10 +32,10 @@ type MonthlyRevenue struct {
 }
 
 type TopProduct struct {
-	Name         string  `json:"name"`
-	SellPrice    float64 `json:"sell_price"`
-	Profit       float64 `json:"profit"`
-	Margin       float64 `json:"margin"`
-	TotalRevenue float64 `json:"total_revenue"`
-	RevenueDate  string  `json:"revenue_date"`
+	Name         string    `json:"name"`
+	SellPrice    float64   `json:"sell_price"`
+	Profit       float64   `json:"profit"`
+	Margin       float64   `json:"margin"`
+	TotalRevenue float64   `json:"total_revenue"`
+	RevenueDate  time.Time `json:"revenue_date"`
 }

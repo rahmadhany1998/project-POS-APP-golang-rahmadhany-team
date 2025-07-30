@@ -83,12 +83,7 @@ func (r *revenueRepositoryImpl) GetMonthlyRevenue(ctx context.Context, startDate
 }
 
 func (r *revenueRepositoryImpl) GetTopProducts(ctx context.Context, startDate, endDate string) ([]dto.TopProduct, error) {
-	topProducts := []struct {
-		Name         string  `json:"name"`
-		SellPrice    float64 `json:"sell_price"`
-		TotalRevenue float64 `json:"total_revenue"`
-		RevenueDate  string  `json:"revenue_date"`
-	}{}
+	var result []dto.TopProduct
 
 	err := r.DB.WithContext(ctx).
 		Raw(`
@@ -99,24 +94,14 @@ func (r *revenueRepositoryImpl) GetTopProducts(ctx context.Context, startDate, e
 			JOIN products p ON p.id = oi.product_id
 			JOIN orders o ON o.id = oi.order_id
 			WHERE o.created_at BETWEEN ? AND ?
-			GROUP BY p.name, p.price, revenue_date
+			GROUP BY p.name, p.price, DATE(o.created_at)
 			ORDER BY total_revenue DESC
 			LIMIT 10
 		`, startDate, endDate).
-		Scan(&topProducts).Error
+		Scan(&result).Error
 	if err != nil {
 		r.Log.Error("failed to get top products", zap.String("error", err.Error()))
 		return nil, err
-	}
-
-	var result []dto.TopProduct
-	for _, p := range topProducts {
-		result = append(result, dto.TopProduct{
-			Name:         p.Name,
-			SellPrice:    p.SellPrice,
-			TotalRevenue: p.TotalRevenue,
-			RevenueDate:  p.RevenueDate,
-		})
 	}
 	return result, nil
 }
