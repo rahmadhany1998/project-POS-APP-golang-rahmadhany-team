@@ -4,6 +4,7 @@ import (
 	"context"
 	"project-POS-APP-golang-be-team/internal/data/entity"
 	"project-POS-APP-golang-be-team/internal/dto"
+	"time"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -65,20 +66,41 @@ func (r *revenueRepositoryImpl) GetRevenueSummary(ctx context.Context, startDate
 }
 
 func (r *revenueRepositoryImpl) GetMonthlyRevenue(ctx context.Context, startDate, endDate string) ([]dto.MonthlyRevenue, error) {
-	var monthly []dto.MonthlyRevenue
+	type result struct {
+		Month time.Time
+		Total float64
+	}
+
+	var rawResult []result
 	err := r.DB.WithContext(ctx).
 		Raw(`
-			SELECT TO_CHAR(created_at, 'YYYY-MM') AS month, SUM(total) AS total
+			SELECT DATE_TRUNC('month', created_at) AS month, SUM(total) AS total
 			FROM orders
 			WHERE created_at BETWEEN ? AND ?
 			GROUP BY month
 			ORDER BY month ASC
 		`, startDate, endDate).
-		Scan(&monthly).Error
+		Scan(&rawResult).Error
 	if err != nil {
 		r.Log.Error("failed to get monthly revenue", zap.String("error", err.Error()))
 		return nil, err
 	}
+
+	// Fill all 12 months with default zero if missing
+	monthlyMap := make(map[string]float64)
+	for _, row := range rawResult {
+		monthlyMap[row.Month.Format("January")] = row.Total
+	}
+
+	months := []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+	var monthly []dto.MonthlyRevenue
+	for _, month := range months {
+		monthly = append(monthly, dto.MonthlyRevenue{
+			Month: month,
+			Total: monthlyMap[month],
+		})
+	}
+
 	return monthly, nil
 }
 

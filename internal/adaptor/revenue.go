@@ -42,7 +42,20 @@ func (h *HandlerRevenue) GetMonthlyRevenue(ctx *gin.Context) {
 		response.ResponseBadRequest(ctx, http.StatusInternalServerError, "failed to get monthly revenue")
 		return
 	}
-	response.ResponseSuccess(ctx, http.StatusOK, "success", monthly)
+	type chartData struct {
+		Label string  `json:"label"`
+		Data  float64 `json:"data"`
+	}
+
+	var resp []chartData
+	for _, m := range monthly {
+		resp = append(resp, chartData{
+			Label: m.Month,
+			Data:  m.Total,
+		})
+	}
+
+	response.ResponseSuccess(ctx, http.StatusOK, "success", resp)
 }
 
 func (h *HandlerRevenue) GetTopProducts(ctx *gin.Context) {
