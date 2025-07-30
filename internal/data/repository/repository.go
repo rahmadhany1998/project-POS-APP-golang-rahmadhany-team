@@ -8,11 +8,13 @@ import (
 type Repository struct {
 	AuthRepo    AuthRepository
 	RevenueRepo RevenueRepository
+	MenuRepo    MenuRepository
 }
 
 func NewRepository(db *gorm.DB, log *zap.Logger) Repository {
 	return Repository{
 		AuthRepo:    NewAuthRepository(db, log),
 		RevenueRepo: NewRevenueRepository(db, log),
+		MenuRepo:    NewMenuRepository(db),
 	}
 }

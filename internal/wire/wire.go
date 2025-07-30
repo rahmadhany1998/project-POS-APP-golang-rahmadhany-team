@@ -46,7 +46,7 @@ func wireRevenue(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddlewar
 
 func wireMenu(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
 	usecaseMenu := usecase.NewMenuUsecase(repo, logger, config)
-	adaptorMenu := adaptor.NewMenuHandler(usecaseMenu, logger)
+	adaptorMenu := adaptor.NewMenuHandler(usecaseMenu)
 	menuRoute := router.Group("/menus").Use(middlwareAuth.Auth())
 
 	menuRoute.GET("", adaptorMenu.GetAllMenus)
