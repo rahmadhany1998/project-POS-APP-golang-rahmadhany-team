@@ -18,6 +18,7 @@ func Wiring(repo repository.Repository, mLogger middleware.LoggerMiddleware, mid
 	wireUser(api, middlwareAuth, repo, logger, config)
 	wireAuth(api, middlwareAuth, repo, logger, config)
 	wireRevenue(api, middlwareAuth, repo, logger, config)
+	wireMenu(api, middlwareAuth, repo, logger, config)
 	return router
 }
 
@@ -41,4 +42,16 @@ func wireRevenue(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddlewar
 	usecaseRevenue := usecase.NewRevenueService(repo, logger, config)
 	adaptorRevenue := adaptor.NewHandlerRevenue(usecaseRevenue, logger)
 	router.GET("/revenue", middlwareAuth.Auth(), adaptorRevenue.GetRevenueReport)
+}
+
+func wireMenu(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
+	usecaseMenu := usecase.NewMenuUsecase(repo, logger, config)
+	adaptorMenu := adaptor.NewMenuHandler(usecaseMenu, logger)
+	menuRoute := router.Group("/menus").Use(middlwareAuth.Auth())
+
+	menuRoute.GET("", adaptorMenu.GetAllMenus)
+	menuRoute.GET("/:id", adaptorMenu.GetMenuByID)
+	menuRoute.POST("", adaptorMenu.CreateMenu)
+	menuRoute.PUT("/:id", adaptorMenu.UpdateMenu)
+	menuRoute.DELETE("/:id", adaptorMenu.DeleteMenu)
 }
