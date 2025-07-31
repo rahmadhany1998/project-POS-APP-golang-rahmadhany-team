@@ -22,9 +22,14 @@ func Wiring(repo repository.Repository, mLogger middleware.LoggerMiddleware, mid
 	return router
 }
 
-func wireUser(router *gin.RouterGroup, middlwareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
+func wireUser(router *gin.RouterGroup, middlewareAuth middleware.AuthMiddleware, repo repository.Repository, logger *zap.Logger, config utils.Configuration) {
 	usecaseUser := usecase.NewUserService(repo, logger, config)
 	adaptorUser := adaptor.NewHandlerUser(usecaseUser, logger)
+
+	router.GET("/user/profile", middlewareAuth.Auth(), adaptorUser.GetProfile)
+	router.PUT("/user/profile", middlewareAuth.Auth(), adaptorUser.UpdateProfile)
+	router.GET("/admin/list", middlewareAuth.Auth(), adaptorUser.GetAdminList)
+	router.PUT("/admin/role", middlewareAuth.Auth(), adaptorUser.UpdateAdminAccess)
 	router.GET("/test-handler", adaptorUser.TestHandler)
 }
 

@@ -53,3 +53,11 @@ func ResponsePagination(ctx *gin.Context, code int, message string, data any, pa
 
 	ctx.JSON(code, response)
 }
+
+func ResponseError(ctx *gin.Context, code int, message string) {
+	response := Reponse{
+		Status:  false,
+		Message: message,
+	}
+	ctx.JSON(code, response)
+}
