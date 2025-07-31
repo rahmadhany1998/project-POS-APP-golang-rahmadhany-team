@@ -5,14 +5,18 @@ import (
 )
 
 type Configuration struct {
-	AppName    string
-	Port       string
-	Debug      bool
-	DB         DatabaseConfig
-	Limit      int
-	PathLogger string
-	PathUpload string
-	Margin     float64
+	AppName      string
+	Port         string
+	Debug        bool
+	DB           DatabaseConfig
+	Limit        int
+	PathLogger   string
+	PathUpload   string
+	Margin       float64
+	SMTPHost     string
+	SMTPPort     int
+	SMTPEmail    string
+	SMTPPassword string
 }
 
 type DatabaseConfig struct {
@@ -58,5 +62,9 @@ func ReadConfiguration() (Configuration, error) {
 			MaxIdleTime:  viper.GetInt("DB_MAX_IDLE_TIME"),
 			MaxLifeTime:  viper.GetInt("DB_MAX_LIFE_TIME"),
 		},
+		SMTPHost:     viper.GetString("SMTPHost"),
+		SMTPPort:     viper.GetInt("SMTPPort"),
+		SMTPEmail:    viper.GetString("SMTPEmail"),
+		SMTPPassword: viper.GetString("SMTPPassword"),
 	}, nil
 }
