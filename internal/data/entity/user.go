@@ -20,8 +20,6 @@ type User struct {
 	ShiftEnd   string    `json:"shift_end"`
 	Detail     string    `gorm:"type:text" json:"detail"`
 	IsActive   bool      `gorm:"default:true"`
-
-	
 }
 
 func SeedUsers() []User {
