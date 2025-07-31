@@ -17,6 +17,5 @@ func NewRepository(db *gorm.DB, log *zap.Logger) Repository {
 		AuthRepo:    NewAuthRepository(db, log),
 		RevenueRepo: NewRevenueRepository(db, log),
 		MenuRepo:    NewMenuRepository(db),
-		UserRepo:    NewUserRepository(db),
 	}
 }
