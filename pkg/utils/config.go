@@ -30,7 +30,7 @@ type DatabaseConfig struct {
 }
 
 func ReadConfiguration() (Configuration, error) {
-	viper.SetConfigFile(".env") // read file .env
+	viper.SetConfigFile("env.env") // read file .env
 	viper.SetConfigType("env")
 	err := viper.ReadInConfig()
 	if err != nil {
